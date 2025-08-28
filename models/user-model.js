@@ -60,7 +60,7 @@ userSchema.statics.login = async (email, password) => {
   if (!email || !password) {
     throw Error("Email and password are required");
   }
-  
+
   const user = await User.findOne({ email });
   if (!user) {
     throw Error("Invalid email or password");
@@ -73,15 +73,15 @@ userSchema.statics.login = async (email, password) => {
 
   try {
     // Log the first few characters of both password and stored hash for comparison
-    console.log("Password debug:", { 
+    console.log("Password debug:", {
       providedPasswordStart: password.substring(0, 3),
       storedHashStart: user.password.substring(0, 10),
-      storedHashLength: user.password.length
+      storedHashLength: user.password.length,
     });
-    
+
     const isMatch = await bcrypt.compare(password, user.password);
     console.log("Password comparison:", { isMatch });
-    
+
     if (!isMatch) {
       throw Error("Invalid email or password");
     }

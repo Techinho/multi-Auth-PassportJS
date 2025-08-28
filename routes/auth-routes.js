@@ -22,11 +22,18 @@ router.get("/register", (req, res) => {
 });
 router.post("/register", async (req, res) => {
   const { email, password, username } = req.body;
-  console.log("Register attempt:", { email, username, passwordLength: password?.length });
-  
+  console.log("Register attempt:", {
+    email,
+    username,
+    passwordLength: password?.length,
+  });
+
   try {
     const user = await User.signup(email, password, username);
-    console.log("User registered successfully:", { id: user._id, email: user.email });
+    console.log("User registered successfully:", {
+      id: user._id,
+      email: user.email,
+    });
     res.status(201).json({ msg: "User registered", userId: user._id });
   } catch (err) {
     console.error("Registration error:", err.message);
@@ -40,7 +47,7 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   console.log("Login attempt:", { email, passwordLength: password?.length });
-  
+
   try {
     // Try to find the user first to debug the issue
     const userExists = await User.findOne({ email });
@@ -48,12 +55,12 @@ router.post("/login", async (req, res) => {
       console.log("User not found in database for email:", email);
       return res.status(400).json({ error: "Invalid email or password" });
     }
-    
-    console.log("User found in database:", { 
-      id: userExists._id, 
+
+    console.log("User found in database:", {
+      id: userExists._id,
       hasPassword: !!userExists.password,
       isGoogleUser: !!userExists.googleId,
-      isGithubUser: !!userExists.githubId
+      isGithubUser: !!userExists.githubId,
     });
 
     // Now try to login
