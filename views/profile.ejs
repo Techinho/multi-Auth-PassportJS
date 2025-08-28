@@ -1,0 +1,292 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>User Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        margin: 0;
+        background-color: #f8fafc;
+        color: #1e293b;
+        line-height: 1.6;
+      }
+      nav {
+        background: #2563eb;
+        padding: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      nav ul {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      nav li {
+        list-style-type: none;
+        display: inline-block;
+        margin: 0 1rem 0 0;
+      }
+      nav a {
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 500;
+        background: rgba(255,255,255,0.1);
+        text-decoration: none;
+        padding: 0.75rem 1.25rem;
+        border-radius: 0.5rem;
+        transition: all 0.2s ease;
+      }
+      .profile-header {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        padding: 2rem;
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      }
+      .profile-img {
+        border-radius: 50%;
+        box-shadow: 0 4px 16px rgba(30,60,114,0.08);
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border: 4px solid #1e3c72;
+        background: #fff;
+      }
+      .profile-info {
+        flex: 1;
+      }
+      .profile-info h2 {
+        color: #1e3c72;
+      }
+      .activity-panel {
+        margin-top: 2rem;
+      }
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(30,60,114,0.08);
+        padding: 2rem;
+      }
+      .btn-danger {
+        background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+        color: #fff;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(30,60,114,0.08);
+        transition: background 0.2s;
+      }
+      .btn-danger:hover {
+        background: linear-gradient(90deg, #2a5298 0%, #1e3c72 100%);
+      }
+      .card-header {
+        background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+        color: #fff;
+        border-radius: 12px 12px 0 0;
+      }
+      .btn {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 0.5rem;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+      
+      .btn-danger {
+        background-color: #ef4444;
+        color: white;
+      }
+      
+      .btn-danger:hover {
+        background-color: #dc2626;
+      }
+      
+      .container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+      }
+      
+      .card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        overflow: hidden;
+      }
+      
+      .card-header {
+        padding: 1rem 1.5rem;
+        background: #2563eb;
+        color: white;
+      }
+      
+      .card-body {
+        padding: 1.5rem;
+      }
+      
+      .list-group {
+        list-style: none;
+        padding: 0;
+      }
+      
+      .list-group-item {
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      
+      .list-group-item:last-child {
+        border-bottom: none;
+      }
+      
+      #loading {
+        text-align: center;
+        padding: 2rem;
+        font-size: 1.25rem;
+        color: #64748b;
+      }
+      
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li style="margin-left: auto;"><a href="#" id="logoutBtn" class="btn-danger">Logout</a></li>
+      </ul>
+    </nav>
+    
+    <div class="container">
+      <div id="loading">Loading profile data...</div>
+      
+      <div id="profileContent" class="hidden">
+        <div class="profile-header">
+          <img id="userThumbnail" src="" alt="Profile Photo" class="profile-img">
+          <div class="profile-info">
+            <h2>Welcome, <span id="username"></span>!</h2>
+            <p><strong>Email:</strong> <span id="userEmail"></span></p>
+            <p><strong>ID:</strong> <span id="userId"></span></p>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <h3 style="margin: 0;">Recent Activity</h3>
+          </div>
+          <div class="card-body">
+            <ul class="list-group">
+              <li class="list-group-item" id="loginMethod"></li>
+              <li class="list-group-item">Profile viewed on <span id="currentDate"></span></li>
+              <li class="list-group-item">No additional activity yet.</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <h3 style="margin: 0;">Account Details</h3>
+          </div>
+          <div class="card-body">
+            <p><strong>User ID:</strong> <span id="userIdDetails"></span></p>
+            <p><strong>Username:</strong> <span id="usernameDetails"></span></p>
+            <p><strong>Email:</strong> <span id="userEmailDetails"></span></p>
+            <p><strong>Account Type:</strong> <span id="accountType"></span></p>
+            <p><strong>Account Created:</strong> <span id="creationDate"></span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', async () => {
+        // Check if the user has a JWT token
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+          window.location.href = '/auth/login';
+          return;
+        }
+        
+        try {
+          // Fetch user data
+          const response = await fetch('/auth/profile', {
+            headers: {
+              'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error('Failed to fetch profile data');
+          }
+          
+          const userData = await response.json();
+          
+          // Display user data
+          document.getElementById('username').textContent = userData.user.username || 'User';
+          document.getElementById('userEmail').textContent = userData.user.email || 'No email provided';
+          document.getElementById('userId').textContent = userData.user._id;
+          
+          document.getElementById('userIdDetails').textContent = userData.user._id;
+          document.getElementById('usernameDetails').textContent = userData.user.username || 'No username';
+          document.getElementById('userEmailDetails').textContent = userData.user.email || 'No email provided';
+          
+          // Set profile image with fallback
+          const thumbnailElement = document.getElementById('userThumbnail');
+          if (userData.user.thumbnail) {
+            thumbnailElement.src = userData.user.thumbnail;
+          } else {
+            thumbnailElement.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(userData.user.username || 'User');
+          }
+          
+          // Determine account type
+          let accountType = 'Email/Password';
+          if (userData.user.googleId) accountType = 'Google OAuth';
+          if (userData.user.githubId) accountType = 'GitHub OAuth';
+          
+          document.getElementById('accountType').textContent = accountType;
+          document.getElementById('loginMethod').textContent = `Logged in with ${accountType}`;
+          
+          // Set current date
+          const currentDate = new Date().toLocaleDateString();
+          document.getElementById('currentDate').textContent = currentDate;
+          document.getElementById('creationDate').textContent = currentDate; // Placeholder
+          
+          // Show profile content
+          document.getElementById('loading').classList.add('hidden');
+          document.getElementById('profileContent').classList.remove('hidden');
+          
+        } catch (error) {
+          console.error('Error fetching profile data:', error);
+          window.location.href = '/auth/login';
+        }
+        
+        // Handle logout
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+          e.preventDefault();
+          
+          // Remove token
+          localStorage.removeItem('token');
+          
+          // Redirect to home
+          window.location.href = '/';
+        });
+      });
+    </script>
+  </body>
+</html>
