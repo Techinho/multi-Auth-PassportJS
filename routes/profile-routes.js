@@ -31,9 +31,10 @@ const checkJwt = (req, res, next) => {
   }
 };
 
-// Profile route that works with both session and JWT
-router.get("/", checkJwt, (req, res) => {
-  res.render("profile", { user: req.user });
+// Profile route that serves the page without authentication check
+// Let the client-side JavaScript handle authentication
+router.get("/", (req, res) => {
+  res.render("profile", { user: null });
 });
 
 module.exports = router;
