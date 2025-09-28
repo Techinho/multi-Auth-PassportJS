@@ -27,7 +27,13 @@ passport.deserializeUser(async (id, done) => {
 passport.use(
   new JwtStrategy(
     {
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: (req) => {
+        // Extract JWT from httpOnly cookie
+        if (req && req.cookies) {
+          return req.cookies.accessToken;
+        }
+        return null;
+      },
       secretOrKey: JWT_SECRET,
     },
     async (payload, done) => {

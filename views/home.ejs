@@ -527,31 +527,26 @@
         </main>
 
         <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const token = localStorage.getItem('token');
-                const logoutBtn = document.getElementById('logoutBtn');
-                
-                // Check if user is logged in
-                if (token) {
-                    // Show logged in UI
-                    document.getElementById('profileLink').style.display = 'inline-block';
-                    document.getElementById('logoutLink').style.display = 'inline-block';
-                    document.getElementById('loginLink').style.display = 'none';
-                    document.getElementById('registerLink').style.display = 'none';
-                    document.getElementById('userContent').style.display = 'block';
-                    document.getElementById('guestContent').style.display = 'none';
+            document.addEventListener('DOMContentLoaded', async () => {
+                try {
+                    // Check if user is authenticated by calling the /auth/me endpoint
+                    const response = await fetch('/auth/me', {
+                        method: 'GET',
+                        credentials: 'include' // Include cookies in the request
+                    });
                     
-                    // Get user data for greeting
-                    fetch('/auth/profile', {
-                        headers: {
-                            'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`
-                        }
-                    })
-                    .then(res => {
-                        if (res.ok) return res.json();
-                        throw new Error('Failed to fetch profile');
-                    })
-                    .then(data => {
+                    if (response.ok) {
+                        const data = await response.json();
+                        
+                        // Show logged in UI
+                        document.getElementById('profileLink').style.display = 'inline-block';
+                        document.getElementById('logoutLink').style.display = 'inline-block';
+                        document.getElementById('loginLink').style.display = 'none';
+                        document.getElementById('registerLink').style.display = 'none';
+                        document.getElementById('userContent').style.display = 'block';
+                        document.getElementById('guestContent').style.display = 'none';
+                        
+                        // Set user greeting
                         const username = data.user.username || data.user.email.split('@')[0];
                         document.getElementById('userGreeting').textContent = username;
                         
@@ -564,30 +559,43 @@
                             // Otherwise show first letter of username
                             avatarEl.textContent = username.charAt(0).toUpperCase();
                         }
-                    })
-                    .catch(err => {
-                        console.error('Error fetching profile:', err);
-                        // If token is invalid, remove it and refresh
-                        localStorage.removeItem('token');
-                        window.location.reload();
-                    });
-                    
-                    // Handle logout with animation
-                    logoutBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
                         
-                        // Add a visual indicator for logout
-                        logoutBtn.textContent = 'Logging out...';
-                        logoutBtn.style.opacity = '0.7';
+                        // Handle logout with cookie-based authentication
+                        const logoutBtn = document.getElementById('logoutBtn');
+                        logoutBtn.addEventListener('click', async (e) => {
+                            e.preventDefault();
+                            
+                            // Add a visual indicator for logout
+                            logoutBtn.textContent = 'Logging out...';
+                            logoutBtn.style.opacity = '0.7';
+                            
+                            try {
+                                // Call logout endpoint to clear cookies
+                                await fetch('/auth/logout', {
+                                    method: 'POST',
+                                    credentials: 'include'
+                                });
+                            } catch (error) {
+                                console.error('Logout error:', error);
+                            }
+                            
+                            // Redirect after logout
+                            setTimeout(() => {
+                                window.location.href = '/';
+                            }, 300);
+                        });
                         
-                        // Remove token and redirect after small delay for better UX
-                        setTimeout(() => {
-                            localStorage.removeItem('token');
-                            window.location.href = '/';
-                        }, 300);
-                    });
-                } else {
-                    // Show guest UI
+                    } else {
+                        // User not authenticated, show guest UI
+                        showGuestUI();
+                    }
+                } catch (error) {
+                    console.error('Authentication check failed:', error);
+                    // Show guest UI if authentication check fails
+                    showGuestUI();
+                }
+                
+                function showGuestUI() {
                     document.getElementById('profileLink').style.display = 'none';
                     document.getElementById('logoutLink').style.display = 'none';
                     document.getElementById('loginLink').style.display = 'inline-block';

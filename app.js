@@ -1,9 +1,9 @@
+// app.js
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const session = require("express-session");
-const MongoStore = require("connect-mongo");
 const passport = require("passport");
+const cookieParser = require("cookie-parser");
 
 const authRoutes = require("./routes/auth-routes");
 const profileRoutes = require("./routes/profile-routes");
@@ -15,27 +15,11 @@ const app = express();
 app.use(express.json());
 // Parse URL-encoded bodies
 app.use(express.urlencoded({ extended: true }));
+// Parse cookies
+app.use(cookieParser());
 
-// Session middleware
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
-    name: "myAppSession",
-    cookie: {
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
-      secure: process.env.NODE_ENV === "production", // true only in prod
-      httpOnly: true,
-      sameSite: "lax",
-    },
-  })
-);
-
-// Passport middlewares
+// Passport middleware
 app.use(passport.initialize());
-app.use(passport.session());
 
 // View engine
 app.set("view engine", "ejs");
@@ -44,7 +28,7 @@ app.set("view engine", "ejs");
 app.use("/auth", authRoutes);
 app.use("/profile", profileRoutes);
 app.get("/", (req, res) => {
-  res.render("home", { user: req.user });
+  res.render("home", { user: null });
 });
 
 // Connect to MongoDB

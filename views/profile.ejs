@@ -215,24 +215,15 @@
     
     <script>
       document.addEventListener('DOMContentLoaded', async () => {
-        // Check if the user has a JWT token
-        const token = localStorage.getItem('token');
-        
-        if (!token) {
-          window.location.href = '/auth/login';
-          return;
-        }
-        
         try {
-          // Fetch user data
-          const response = await fetch('/auth/profile', {
-            headers: {
-              'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`
-            }
+          // Fetch user data using cookie-based authentication
+          const response = await fetch('/profile/api', {
+            method: 'GET',
+            credentials: 'include' // Include cookies in the request
           });
           
           if (!response.ok) {
-            throw new Error('Failed to fetch profile data');
+            throw new Error('Authentication failed');
           }
           
           const userData = await response.json();
@@ -240,9 +231,9 @@
           // Display user data
           document.getElementById('username').textContent = userData.user.username || 'User';
           document.getElementById('userEmail').textContent = userData.user.email || 'No email provided';
-          document.getElementById('userId').textContent = userData.user._id;
+          document.getElementById('userId').textContent = userData.user.id;
           
-          document.getElementById('userIdDetails').textContent = userData.user._id;
+          document.getElementById('userIdDetails').textContent = userData.user.id;
           document.getElementById('usernameDetails').textContent = userData.user.username || 'No username';
           document.getElementById('userEmailDetails').textContent = userData.user.email || 'No email provided';
           
@@ -254,7 +245,7 @@
             thumbnailElement.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(userData.user.username || 'User');
           }
           
-          // Determine account type
+          // Determine account type based on user properties
           let accountType = 'Email/Password';
           if (userData.user.googleId) accountType = 'Google OAuth';
           if (userData.user.githubId) accountType = 'GitHub OAuth';
@@ -277,11 +268,18 @@
         }
         
         // Handle logout
-        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
           e.preventDefault();
           
-          // Remove token
-          localStorage.removeItem('token');
+          try {
+            // Call logout endpoint to clear cookies
+            await fetch('/auth/logout', {
+              method: 'POST',
+              credentials: 'include'
+            });
+          } catch (error) {
+            console.error('Logout error:', error);
+          }
           
           // Redirect to home
           window.location.href = '/';

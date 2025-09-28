@@ -175,7 +175,7 @@
                     </div>
                 <% } %>
                 
-                <form id="loginForm">
+                <form id="loginForm" action="/auth/login" method="POST">
                     <div class="form-group">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" id="email" name="email" class="form-input" required>
@@ -213,9 +213,10 @@
         </main>
 
         <script>
-            // Check if user was just registered
+            // Check if user was just registered or if there's an error
             const urlParams = new URLSearchParams(window.location.search);
             const registered = urlParams.get('registered');
+            const error = urlParams.get('error');
             
             if (registered) {
                 const errorDiv = document.getElementById('errorMessage');
@@ -223,40 +224,14 @@
                 errorDiv.className = 'success-message';
             }
             
-            document.getElementById('loginForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const errorMessage = document.getElementById('errorMessage');
-                errorMessage.textContent = '';
-                errorMessage.className = 'error-message';
-                
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-
-                try {
-                    const response = await fetch('/auth/login', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ email, password })
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (!response.ok) {
-                        throw new Error(data.error || 'Login failed');
-                    }
-                    
-                    // Save token to localStorage
-                    localStorage.setItem('token', data.token);
-                    
-                    // Redirect to profile
-                    window.location.href = '/profile';
-                    
-                } catch (error) {
-                    errorMessage.textContent = error.message;
-                }
-            });
+            if (error) {
+                const errorDiv = document.getElementById('errorMessage');
+                errorDiv.textContent = decodeURIComponent(error);
+                errorDiv.className = 'error-message';
+            }
+            
+            // Since the backend now handles redirects, we can use a regular form submission
+            // Remove the JavaScript form handler to let the form submit normally
         </script>
     </body>
 </html>
